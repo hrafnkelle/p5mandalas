@@ -1,37 +1,10 @@
-## Welcome to GitHub Pages
+## Mandala generator
 
-You can use the [editor on GitHub](https://github.com/hrafnkelle/p5mandalas/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+This is a Mandala generator sketch written in [p5.js](https://p5js.org/).
+It also uses the [p5.vornoi library](https://github.com/Dozed12/p5.voronoi).
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+The concept is to generate a set of points on a circle, then regenerate new points on circles with the points from the previous iteration as centers. This is iterated a few times. A voronoi diagram of the resulting set of points is then the Mandala.
 
-### Markdown
+This was inspired by a [blogpost by Fronkonstin on generating Mandalas in R](https://fronkonstin.com/2018/02/14/mandalas/).
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/hrafnkelle/p5mandalas/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+[Click here to view the sketch](sketch.html).
