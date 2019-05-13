@@ -7,7 +7,8 @@ let radius = 2.9;
 
 function setup() {
   const mindim = min(window.innerWidth, window.innerHeight);
-  createCanvas(mindim, mindim);
+  let canvas = createCanvas(mindim, mindim);
+  canvas.parent('mandala');
 
   background(255);
   for(let i=1; i<=iter; i++) {
