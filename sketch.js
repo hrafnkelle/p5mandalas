@@ -1,7 +1,7 @@
 var points = [[0, 0]];
 
 const iter=5;
-const n=3;
+const n=5;
 let angles = Array(n).fill().map((_, idx)=>idx*2*Math.PI/n);
 let radius = 2.9;
 
