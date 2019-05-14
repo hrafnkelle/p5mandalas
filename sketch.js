@@ -22,6 +22,8 @@ function setup() {
   points = points.map(p => [p[0]+width/2, p[1]+height/2]);
   voronoiSites(points);
   voronoi(width, height);
+  
+  noLoop();
 }
 
 function draw() {
