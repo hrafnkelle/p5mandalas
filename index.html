@@ -1,5 +1,6 @@
 <html>
   <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/p5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/addons/p5.dom.min.js"></script>
     <script src="addons/rhill-voronoi-core.js"></script>
@@ -8,17 +9,20 @@
   </head>
 <body>
   <h2>Mandala generator</h2>
+  <p>
+    <a href="https://github.com/hrafnkelle/p5mandalas/">Find the code here</a>.
+  </p>
 <p>
-This is a Mandala generator sketch written in [p5.js](https://p5js.org/).
-It also uses the [p5.vornoi library](https://github.com/Dozed12/p5.voronoi).
+  This is a Mandala generator sketch written in <a href="https://p5js.org/">p5.js</a>.
+  It also uses the <a href="https://github.com/Dozed12/p5.voronoi">p5.vornoi library</a>.
   </p>
   <p>
-The concept is to generate a set of points on a circle, then regenerate new points on circles with the points from the previous iteration as centers. This is iterated a few times. A voronoi diagram of the resulting set of points is then the Mandala.
+The concept is to generate a set of points on a circle, then regenerate new points on circles with the points from 
+    the previous iteration as centers. This is iterated a few times. A voronoi diagram of the resulting set of points is then the Mandala.
   </p>
   <p>
-This was inspired by a [blogpost by Fronkonstin on generating Mandalas in R](https://fronkonstin.com/2018/02/14/mandalas/).
+    This was inspired by a <a href="https://fronkonstin.com/2018/02/14/mandalas/">blogpost by Fronkonstin on generating Mandalas in R</a>.
   </p>
-<div id='mandala'></div>
-  
+<div id='mandala'></div>  
 </body>
 </html>
