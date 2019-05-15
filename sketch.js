@@ -34,7 +34,7 @@ function draw() {
   clear();  
   stroke(0);
   
-  let points = generatePoints([new Point(0,0)], nSlider.value(), radiusSlider.value(), iterSlider.value(), 0);
+  let points = generatePoints(nSlider.value(), radiusSlider.value(), iterSlider.value());
 
   if (checkbox.checked()) {
     drawPoints(points);
@@ -83,30 +83,30 @@ function drawMandala(points) {
   cells.filter(c=>cellTouchesBoundary(c)).forEach(c=>drawCell(c));
 }
 
-function generatePoints(initialPoints, n, radius, iter, i) {
-  points = initialPoints;
-
-  function ensureUniquePointsByJittering() {
-    points = points.map(p=>new Point(p.x+Math.random()/1000, p.y+Math.random()/1000));
-  }
-
-  function fitPointsToCanvas() {
-    const extreme = 2.2*points.reduce((m, p)=> max(m, max(Math.abs(p.x), Math.abs(p.y))), 0);
-    points = points.map(p=>new Point((width/extreme)*p.x+width/2, (height/extreme)*p.y+height/2));
-  }
-
-  if (iter==i) {
-    fitPointsToCanvas();
-    ensureUniquePointsByJittering();
-    return points;
-  }
-
+function generatePoints(n, radius, iter) {
   let angles = Array(n).fill().map((_, idx)=>idx*2*Math.PI/n);
 
-  var newpoints = [];
-  for(const p of points) {
-    newpoints = newpoints.concat(angles.map(a => new Point(p.x+Math.pow(radius,i+1)*Math.cos(a), p.y+Math.pow(radius,i+1)*Math.sin(a))));
+  function generatePointsInner(points, i) {
+    function ensureUniquePointsByJittering() {
+      points = points.map(p=>new Point(p.x+Math.random()/1000, p.y+Math.random()/1000));
+    }
+  
+    function fitPointsToCanvas() {
+      const extreme = 2.2*points.reduce((m, p)=> max(m, max(Math.abs(p.x), Math.abs(p.y))), 0);
+      points = points.map(p=>new Point((width/extreme)*p.x+width/2, (height/extreme)*p.y+height/2));
+    }
+  
+    if (iter==i) {
+      fitPointsToCanvas();
+      ensureUniquePointsByJittering();
+      return points;
+    }
+    var newpoints = [];
+    for(const p of points) {
+      newpoints = newpoints.concat(angles.map(a => new Point(p.x+Math.pow(radius,i+1)*Math.cos(a), p.y+Math.pow(radius,i+1)*Math.sin(a))));
+    }
+    return generatePointsInner(newpoints, i+1);
   }
-  return generatePoints(newpoints, n, radius, iter, i+1);
-}
 
+  return generatePointsInner([new Point(0, 0)], 0);
+}
