@@ -1,29 +1,30 @@
-let iter=5;
-let n=5;
-let radius = 2.9;
 var nSlider;
 var nText;
 var iterSlider;
 var iterText;
+var radiusSlider;
+var radiusText;
 var checkbox;
-var points = [];
 
-// solutions of r^n+r^(n-1)+..r=0.4
-// which are possible radii of mandala so that it fits in a
-// box bounded by -0.5..0.5 in widht and height
-// n is the iteration count selected
-let radii = [0.286, 0.287, 0.291, 0.306, 0.4]
+class Point {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+}
 
 function setup() {
   const mindim = min(window.innerWidth, window.innerHeight);
   let canvas = createCanvas(mindim, mindim);
   canvas.parent('mandala');
   
-  nText = createP('N-symmetry: ').parent('ui');
-  nSlider = createSlider(3,7,5,1).parent('ui').changed(update);
-  iterText = createP('Iterations: ').parent('ui');
-  iterSlider = createSlider(2,5,4,1).parent('ui').changed(update);
-  checkbox = createCheckbox('Show points', false).parent('ui').changed(update);
+  nText = createP('N-symmetry: ').parent('symmetry');
+  nSlider = createSlider(3,7,5,1).parent('symmetry').changed(update);
+  iterText = createP('Iterations: ').parent('iterations');
+  iterSlider = createSlider(2,5,4,1).parent('iterations').changed(update);
+  radiusText = createP('Radius: ').parent('radius');
+  radiusSlider = createSlider(0.1,5,2.5,0.05).parent('radius').changed(update);
+  checkbox = createCheckbox('Show points', false).parent('checkbox').changed(update);
   background(255);
   noLoop();
   update();
@@ -33,61 +34,79 @@ function draw() {
   clear();  
   stroke(0);
   
-  generatePoints();
+  let points = generatePoints([new Point(0,0)], nSlider.value(), radiusSlider.value(), iterSlider.value(), 0);
 
   if (checkbox.checked()) {
-    drawPoints();
+    drawPoints(points);
   }
-  drawMandala();
+  drawMandala(points);
 }
 
 
 function update() {
   nText.html('N-Symmetry: ' + nSlider.value());
   iterText.html('Iterations: ' + iterSlider.value());
+  radiusText.html('Radius: ' + radiusSlider.value());
   redraw();
 }
 
-function drawPoints() {
+function drawPoints(points) {
   stroke('red');
   fill('red');
   for(const p of points) {
-    circle(p[0], p[1], 3);
+    circle(p.x, p.y, 3);
   }
 }
 
-function drawMandala() {
+function drawMandala(points) {
   noFill();
   stroke(0);
-  voronoiClearSites();
-  voronoiSites(points);
-  voronoi(width, height);
-  
-  var target = voronoiGetCells();
-  for (var i = 0; i < target.length; i++) {
+
+  function cellTouchesBoundary(c) {
+    return c.reduce((inside,p)=>(inside && p[0]>1 && p[0]<width-1 && p[1]>1 && p[1]<height-1), true);
+  }
+
+  function drawCell(cell) {
     beginShape();
-    for (var j = 0; j < target[i].length; j++) {
-      if ((target[i][j][0]>1)&&(target[i][j][0]<width-1)&&(target[i][j][1]>1)&&(target[i][j][1]<height-1)) { 
-        vertex(target[i][j][0], target[i][j][1]);
-      } 
+    for (var j = 0; j < cell.length; j++) {
+        vertex(cell[j][0], cell[j][1]);
     }
     endShape(CLOSE);
+    
   }
+
+  voronoiClearSites();
+  voronoiSites(points.map(p=>[p.x, p.y]));
+  voronoi(width, height);
+  
+  cells = voronoiGetCells()
+  cells.filter(c=>cellTouchesBoundary(c)).forEach(c=>drawCell(c));
 }
 
-function generatePoints() {
-  points = [[0, 0]];
-  n = nSlider.value();
-  iter = iterSlider.value();
-  let angles = Array(n).fill().map((_, idx)=>idx*2*Math.PI/n);
-  
-  for(let i=0; i<iter; i++) {
-    var newpoints = [];
-    for(const p of points) {
-      newpoints = newpoints.concat(angles.map(a => [p[0]+Math.pow(radii[i],i+1)*Math.cos(a), p[1]+Math.pow(radii[i],i+1)*Math.sin(a)]));
-    }
-    points = newpoints;
+function generatePoints(initialPoints, n, radius, iter, i) {
+  points = initialPoints;
+
+  function ensureUniquePointsByJittering() {
+    points = points.map(p=>new Point(p.x+Math.random()/1000, p.y+Math.random()/1000));
   }
-  points = points.map(p=>[width*p[0]+width/2, height*p[1]+height/2]);
+
+  function fitPointsToCanvas() {
+    const extreme = 2.2*points.reduce((m, p)=> max(m, max(Math.abs(p.x), Math.abs(p.y))), 0);
+    points = points.map(p=>new Point((width/extreme)*p.x+width/2, (height/extreme)*p.y+height/2));
+  }
+
+  if (iter==i) {
+    fitPointsToCanvas();
+    ensureUniquePointsByJittering();
+    return points;
+  }
+
+  let angles = Array(n).fill().map((_, idx)=>idx*2*Math.PI/n);
+
+  var newpoints = [];
+  for(const p of points) {
+    newpoints = newpoints.concat(angles.map(a => new Point(p.x+Math.pow(radius,i+1)*Math.cos(a), p.y+Math.pow(radius,i+1)*Math.sin(a))));
+  }
+  return generatePoints(newpoints, n, radius, iter, i+1);
 }
 
