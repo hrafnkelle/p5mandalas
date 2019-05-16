@@ -11,6 +11,8 @@ class Point {
     this.x = x;
     this.y = y;
   }
+
+  toString = () => `(${this.x}, ${this.y})`;
 }
 
 function setup() {
@@ -23,7 +25,7 @@ function setup() {
   iterText = createP('Iterations: ').parent('iterations');
   iterSlider = createSlider(2,5,4,1).parent('iterations').changed(update);
   radiusText = createP('Radius: ').parent('radius');
-  radiusSlider = createSlider(0.1,5,2.5,0.05).parent('radius').changed(update);
+  radiusSlider = createSlider(1.05, 5, 2.0, 0.05).parent('radius').changed(update);
   checkbox = createCheckbox('Show points', false).parent('checkbox').changed(update);
   background(255);
   noLoop();
@@ -44,9 +46,9 @@ function draw() {
 
 
 function update() {
-  nText.html('N-Symmetry: ' + nSlider.value());
-  iterText.html('Iterations: ' + iterSlider.value());
-  radiusText.html('Radius: ' + radiusSlider.value());
+  nText.html(`N-Symmetry: ${nSlider.value()}`);
+  iterText.html(`Iterations: ${iterSlider.value()}`);
+  radiusText.html(`Radius: ${radiusSlider.value()}`);
   redraw();
 }
 
