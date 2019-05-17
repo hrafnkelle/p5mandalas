@@ -80,7 +80,6 @@ function drawMandala(points) {
         vertex(cell[j][0], cell[j][1]);
     }
     endShape(CLOSE);
-    
   }
 
   voronoiClearSites();
@@ -92,29 +91,35 @@ function drawMandala(points) {
 }
 
 function generatePoints(n, radius, iter) {
-  let angles = Array(n).fill().map((_, idx)=>idx*2*Math.PI/n);
+  const angles = Array(n).fill().map((_, idx)=>idx*2*Math.PI/n);
+  const trigAngles = angles.map(a=>[Math.cos(a), Math.sin(a)]);
 
-  function generatePointsInner(points, i) {
+  function generatePointsInner(points, i, radiusAccumulator) {
     function ensureUniquePointsByJittering() {
-      points = points.map(p=>new Point(p.x+Math.random()/1000, p.y+Math.random()/1000));
+      const jitterDelta = 1e-3;
+      points = points.map(p=>new Point(p.x+jitterDelta*Math.random(), p.y+jitterDelta*Math.random()));
     }
-  
+
     function fitPointsToCanvas() {
-      const extreme = 2.2*points.reduce((m, p)=> max(m, max(Math.abs(p.x), Math.abs(p.y))), 0);
-      points = points.map(p=>new Point((width/extreme)*p.x+width/2, (height/extreme)*p.y+height/2));
+      const scaleFactor = 0.5*width/radiusAccumulator;
+      points = points.map(p=>new Point(scaleFactor*p.x+width/2, scaleFactor*p.y+height/2));
     }
-  
+
     if (iter==i) {
       fitPointsToCanvas();
       ensureUniquePointsByJittering();
       return points;
     }
+    const r = Math.pow(radius,i+1);
     var newpoints = [];
     for(const p of points) {
-      newpoints = newpoints.concat(angles.map(a => new Point(p.x+Math.pow(radius,i+1)*Math.cos(a), p.y+Math.pow(radius,i+1)*Math.sin(a))));
+      newpoints = newpoints.concat(trigAngles.map(a => new Point(p.x+r*a[0], p.y+r*a[1])));
     }
-    return generatePointsInner(newpoints, i+1);
+    // Does the same as above for loop, much faster
+    // const newpoints = points.flatMap(p=>trigAngles.map(a=>new Point(p.x+r*a[0], p.y+r*a[1])));
+
+    return generatePointsInner(newpoints, i+1, radiusAccumulator+r);
   }
 
-  return generatePointsInner([new Point(0, 0)], 0);
+  return generatePointsInner([new Point(0, 0)], 0, 0);
 }
