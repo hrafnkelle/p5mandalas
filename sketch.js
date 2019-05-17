@@ -12,7 +12,9 @@ class Point {
     this.y = y;
   }
 
-  toString = () => `(${this.x}, ${this.y})`;
+  toString() {
+    return `(${this.x}, ${this.y})`;
+  }
 }
 
 function setup() {
@@ -36,12 +38,16 @@ function draw() {
   clear();  
   stroke(0);
   
-  let points = generatePoints(nSlider.value(), radiusSlider.value(), iterSlider.value());
-
+  const tick = performance.now();
+  const points = generatePoints(nSlider.value(), radiusSlider.value(), iterSlider.value());
+  const tock = performance.now();
+  console.log(`generatePoints took ${tock-tick} millisec`);
   if (checkbox.checked()) {
     drawPoints(points);
   }
   drawMandala(points);
+  const tack = performance.now();
+  console.log(`drawing took ${tack-tock} millisec`);
 }
 
 
@@ -64,7 +70,7 @@ function drawMandala(points) {
   noFill();
   stroke(0);
 
-  function cellTouchesBoundary(c) {
+  function isInternalCell(c) {
     return c.reduce((inside,p)=>(inside && p[0]>1 && p[0]<width-1 && p[1]>1 && p[1]<height-1), true);
   }
 
