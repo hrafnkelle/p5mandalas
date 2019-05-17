@@ -88,7 +88,7 @@ function drawMandala(points) {
   voronoi(width, height);
   
   cells = voronoiGetCells()
-  cells.filter(c=>cellTouchesBoundary(c)).forEach(c=>drawCell(c));
+  cells.filter(c=>isInternalCell(c)).forEach(c=>drawCell(c));
 }
 
 function generatePoints(n, radius, iter) {
