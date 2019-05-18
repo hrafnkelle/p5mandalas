@@ -6,17 +6,6 @@ var radiusSlider;
 var radiusText;
 var checkbox;
 
-class Point {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-  }
-
-  toString() {
-    return `(${this.x}, ${this.y})`;
-  }
-}
-
 function setup() {
   const mindim = min(window.innerWidth, window.innerHeight);
   let canvas = createCanvas(mindim, mindim);
@@ -93,12 +82,12 @@ function generatePoints(n, radius, iter) {
   function generatePointsInner(points, i, radiusAccumulator) {
     function ensureUniquePointsByJittering() {
       const jitterDelta = 1e-3;
-      points = points.map(p=>new Point(p.x+jitterDelta*Math.random(), p.y+jitterDelta*Math.random()));
+      points = points.map(p=>({x: p.x+jitterDelta*Math.random(), y: p.y+jitterDelta*Math.random()}));
     }
 
     function fitPointsToCanvas() {
       const scaleFactor = 0.5*width/radiusAccumulator;
-      points = points.map(p=>new Point(scaleFactor*p.x+width/2, scaleFactor*p.y+height/2));
+      points = points.map(p=>({x: scaleFactor*p.x+width/2, y: scaleFactor*p.y+height/2}));
     }
 
     if (iter==i) {
@@ -109,13 +98,13 @@ function generatePoints(n, radius, iter) {
     const r = Math.pow(radius,i+1);
     var newpoints = [];
     for(const p of points) {
-      newpoints = newpoints.concat(trigAngles.map(a => new Point(p.x+r*a[0], p.y+r*a[1])));
+      newpoints = newpoints.concat(trigAngles.map(a =>({x: p.x+r*a[0], y: p.y+r*a[1]})));
     }
     // Does the same as above for loop, much faster
-    // const newpoints = points.flatMap(p=>trigAngles.map(a=>new Point(p.x+r*a[0], p.y+r*a[1])));
+    // const newpoints = points.flatMap(p=>trigAngles.map(a=>({x: p.x+r*a[0], y: p.y+r*a[1]})));
 
     return generatePointsInner(newpoints, i+1, radiusAccumulator+r);
   }
 
-  return generatePointsInner([new Point(0, 0)], 0, 0);
+  return generatePointsInner([{x: 0, y: 0}], 0, 0);
 }
