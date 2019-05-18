@@ -61,9 +61,7 @@ function update() {
 function drawPoints(points) {
   stroke('red');
   fill('red');
-  for(const p of points) {
-    circle(p.x, p.y, 3);
-  }
+  points.forEach(p=>circle(p.x, p.y, 3))
 }
 
 function drawMandala(points) {
@@ -76,9 +74,7 @@ function drawMandala(points) {
 
   function drawCell(cell) {
     beginShape();
-    for (var j = 0; j < cell.length; j++) {
-        vertex(cell[j][0], cell[j][1]);
-    }
+    cell.forEach(v=>vertex(v[0], v[1]))
     endShape(CLOSE);
   }
 
