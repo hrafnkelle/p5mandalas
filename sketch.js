@@ -82,7 +82,18 @@ function generatePoints(n, radius, iter) {
   function generatePointsInner(points, i, radiusAccumulator) {
     function ensureUniquePointsByJittering() {
       const jitterDelta = 1e-3;
-      points = points.map(p=>({x: p.x+jitterDelta*Math.random(), y: p.y+jitterDelta*Math.random()}));
+      // Deterministic seeded random based on point coordinates
+      function seededRandom(x, y) {
+        // Magic constants (12.9898, 78.233) mix x,y to avoid patterns
+        // Math.sin() adds non-linearity; 43758.5453 scales output for better distribution
+        // Fractional part (- Math.floor) returns value in [0,1)
+        const seed = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+        return seed - Math.floor(seed);
+      }
+      points = points.map(p=>({
+        x: p.x + jitterDelta * (seededRandom(p.x, p.y) - 0.5),
+        y: p.y + jitterDelta * (seededRandom(p.x + 0.5, p.y + 0.5) - 0.5)
+      }));
     }
 
     function fitPointsToCanvas() {
