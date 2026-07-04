@@ -57,6 +57,34 @@ function drawMandala(points) {
   noFill();
   stroke(0);
 
+  function getVoronoiSites(sourcePoints, jitterDelta = 0) {
+    const unique = new Set();
+    const sites = [];
+    const keyPrecision = 1e4;
+
+    sourcePoints.forEach((p, idx) => {
+      if (!Number.isFinite(p.x) || !Number.isFinite(p.y)) {
+        return;
+      }
+
+      // When needed, add a tiny deterministic offset to break geometric ties.
+      const xj = p.x + jitterDelta * Math.sin((idx + 1) * 12.9898);
+      const yj = p.y + jitterDelta * Math.cos((idx + 1) * 78.233);
+      const x = constrain(xj, 1e-3, width - 1e-3);
+      const y = constrain(yj, 1e-3, height - 1e-3);
+      const key = `${Math.round(x * keyPrecision)},${Math.round(y * keyPrecision)}`;
+
+      if (unique.has(key)) {
+        return;
+      }
+
+      unique.add(key);
+      sites.push([x, y]);
+    });
+
+    return sites;
+  }
+
   function isInternalCell(c) {
     return c.reduce((inside,p)=>(inside && p[0]>1 && p[0]<width-1 && p[1]>1 && p[1]<height-1), true);
   }
@@ -67,11 +95,27 @@ function drawMandala(points) {
     endShape(CLOSE);
   }
 
-  voronoiClearSites();
-  voronoiSites(points.map(p=>[p.x, p.y]));
-  voronoi(width, height);
-  
-  cells = voronoiGetCells()
+  let sites = getVoronoiSites(points);
+  if (sites.length < 2) {
+    return;
+  }
+
+  try {
+    voronoiClearSites();
+    voronoiSites(sites);
+    voronoi(width, height);
+  } catch (err) {
+    console.warn('Voronoi failed with base points; retrying with tie-break jitter.', err);
+    sites = getVoronoiSites(points, 1e-3);
+    if (sites.length < 2) {
+      return;
+    }
+    voronoiClearSites();
+    voronoiSites(sites);
+    voronoi(width, height);
+  }
+
+  const cells = voronoiGetCells();
   cells.filter(c=>isInternalCell(c)).forEach(c=>drawCell(c));
 }
 
@@ -82,17 +126,18 @@ function generatePoints(n, radius, iter) {
   function generatePointsInner(points, i, radiusAccumulator) {
     function ensureUniquePointsByJittering() {
       const jitterDelta = 1e-3;
-      // Deterministic seeded random based on point coordinates
-      function seededRandom(x, y) {
+      // Deterministic seeded random based on point coordinates and index.
+      function seededRandom(x, y, salt) {
         // Magic constants (12.9898, 78.233) mix x,y to avoid patterns
         // Math.sin() adds non-linearity; 43758.5453 scales output for better distribution
         // Fractional part (- Math.floor) returns value in [0,1)
-        const seed = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+        const seed = Math.sin(x * 12.9898 + y * 78.233 + salt * 37.719) * 43758.5453;
         return seed - Math.floor(seed);
       }
-      points = points.map(p=>({
-        x: p.x + jitterDelta * (seededRandom(p.x, p.y) - 0.5),
-        y: p.y + jitterDelta * (seededRandom(p.x + 0.5, p.y + 0.5) - 0.5)
+
+      points = points.map((p, idx)=>({
+        x: p.x + jitterDelta * (seededRandom(p.x, p.y, idx) - 0.5),
+        y: p.y + jitterDelta * (seededRandom(p.x + 0.5, p.y + 0.5, idx + 1) - 0.5)
       }));
     }
 
