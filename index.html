@@ -6,29 +6,64 @@
   <script src="addons/rhill-voronoi-core.js"></script>
   <script src="addons/p5.voronoi.js"></script>
   <script src="sketch.js"></script>
+  <style>
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        padding: 0;
+        margin: 0;
+        max-width: none;
+        width: 100%;
+      }
+      #mandala {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+      }
+      #mandala canvas {
+        max-width: 100% !important;
+        max-height: 100vh !important;
+        width: auto !important;
+        height: auto !important;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h2>Mandala generator</h2>
-    <p>Created by <a href="https://twitter.com/hrafnkelle">@hrafnkelle</a></p>
-    <div id='ui'>
+    <h2 class="no-print">Mandala generator</h2>
+    <p class="no-print">Created by <a href="https://twitter.com/hrafnkelle">@hrafnkelle</a></p>
+    <div id='ui' class="no-print">
       <div id='symmetry' style="float:left; margin-right: 40px"></div>
       <div id='iterations' style="float:left; margin-right: 40px"></div>
       <div id='radius' style="float:left; margin-right: 40px"></div>
       <div id='checkbox' style="float:left; margin-right: 40px"></div>
+      <div style="float:left; margin-right: 40px; padding-top: 10px">
+        <button class="btn btn-primary" onclick="window.print()">Print</button>
+      </div>
     </div>
     <div id='mandala'></div>
-    <p>
+    <p class="no-print">
       <a href="https://github.com/hrafnkelle/p5mandalas/">Find the code here</a>.
     </p>
-    <p>
+    <p class="no-print">
       This is a Mandala generator sketch written in <a href="https://p5js.org/">p5.js</a>.
       It also uses the <a href="https://github.com/Dozed12/p5.voronoi">p5.vornoi library</a>.
     </p>
-    <p>
+    <p class="no-print">
       The concept is to generate a set of points on a circle, then regenerate new points on circles with the points from the previous iteration as centers. This is iterated a few times. A voronoi diagram of the resulting set of points is then the Mandala.
     </p>
-    <p>
+    <p class="no-print">
       This was inspired by a <a href="https://fronkonstin.com/2018/02/14/mandalas/">blogpost by Fronkonstin on generating Mandalas in R</a>.
     </p>
   </div>  
